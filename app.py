@@ -23,6 +23,10 @@ def get_audio_url(video_url):
         audio_url = video_info['url']
         return audio_url
 
+@app.route('/')
+def home():
+    return "API is live!"
+
 @app.route('/get-audio-url', methods=['POST'])
 def get_audio():
     data = request.json
