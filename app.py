@@ -28,15 +28,23 @@ def home():
     return "API is live!"
 
 @app.route('/get-audio-url', methods=['POST'])
-def get_audio():
-    data = request.json
+def get_audio_url():
+    data = request.get_json()
     video_url = data.get('video_url')
     
     if not video_url:
-        return jsonify({"error": "video_url is required"}), 400
-    
+        return jsonify({"error": "Missing video_url parameter"}), 400
+
     try:
-        audio_url = get_audio_url(video_url)
+        # Sử dụng yt-dlp với cookies
+        ydl_opts = {
+            'format': 'bestaudio',
+            'noplaylist': True,
+            'cookiefile': 'cookies.txt'
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=False)
+            audio_url = info['url']
         return jsonify({"audio_url": audio_url})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
